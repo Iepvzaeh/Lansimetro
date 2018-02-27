@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.shape.Circle?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="881.0" prefWidth="589.0" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="länsimetroController.Kontrolleri">
+   <children>
+      <ImageView fitHeight="869.0" fitWidth="583.0" layoutX="3.0" layoutY="3.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@FINAALI.png" />
+         </image>
+      </ImageView>
+      <Button fx:id="päiväNappi" layoutX="14.0" layoutY="796.0" mnemonicParsing="false" onAction="#paivaKayntiin" prefHeight="74.0" prefWidth="125.0" text="Päivä" />
+      <Button fx:id="viikkoNappi" layoutX="158.0" layoutY="796.0" mnemonicParsing="false" onAction="#viikkoKayntiin" prefHeight="74.0" prefWidth="125.0" text="Viikko" />
+      <Button fx:id="koeajoNappi" layoutX="308.0" layoutY="796.0" mnemonicParsing="false" onAction="#käynnistäKoeAjo" prefHeight="74.0" prefWidth="125.0" text="Koe" />
+      <Button fx:id="lopetaNappi" layoutX="449.0" layoutY="796.0" mnemonicParsing="false" onAction="#suljeNappi" prefHeight="74.0" prefWidth="125.0" text="Lopeta" />
+      <TextField fx:id="rahaIkkuna" editable="false" layoutX="234.0" layoutY="759.0" prefHeight="31.0" prefWidth="306.0" promptText="rahaikkuna" />
+      <TextField fx:id="kalenteriIkkuna" editable="false" layoutX="231.0" layoutY="721.0" prefHeight="31.0" prefWidth="153.0" promptText="kalenteriikkuna" />
+      <TextField fx:id="koeajoIkkuna" editable="false" layoutX="387.0" layoutY="721.0" prefHeight="31.0" prefWidth="153.0" promptText="koestatusikkuna" />
+      <Circle fx:id="matinkyläCircle" fill="WHITE" layoutX="32.0" layoutY="103.0" radius="7.0" stroke="BLACK" strokeType="INSIDE" />
+      <Circle fx:id="niittykumpuCircle" fill="WHITE" layoutX="32.0" layoutY="188.0" radius="7.0" stroke="BLACK" strokeType="INSIDE" />
+      <Circle fx:id="keilaniemiCircle" fill="WHITE" layoutX="32.0" layoutY="531.0" radius="7.0" stroke="BLACK" strokeType="INSIDE" />
+      <Circle fx:id="aaltoCircle" fill="WHITE" layoutX="32.0" layoutY="445.0" radius="7.0" stroke="BLACK" strokeType="INSIDE" />
+      <Circle fx:id="tapiolaCircle" fill="WHITE" layoutX="32.0" layoutY="359.0" radius="7.0" stroke="BLACK" strokeType="INSIDE" />
+      <Circle fx:id="urheilupuistoCircle" fill="WHITE" layoutX="32.0" layoutY="274.0" radius="7.0" stroke="BLACK" strokeType="INSIDE" />
+      <Circle fx:id="koivusaariCircle" fill="WHITE" layoutX="32.0" layoutY="616.0" radius="7.0" stroke="BLACK" strokeType="INSIDE" />
+      <Circle fx:id="lauttasaariCircle" fill="WHITE" layoutX="32.0" layoutY="702.0" radius="7.0" stroke="BLACK" strokeType="INSIDE" />
+      <TextField fx:id="matinkyläIkkuna" editable="false" layoutX="41.0" layoutY="131.0" prefHeight="31.0" prefWidth="179.0">
+         <font>
+            <Font name="System Bold Italic" size="12.0" />
+         </font></TextField>
+      <TextField fx:id="niittykumpuIkkuna" editable="false" layoutX="41.0" layoutY="219.0" prefHeight="31.0" prefWidth="179.0">
+         <font>
+            <Font name="System Bold Italic" size="12.0" />
+         </font></TextField>
+      <TextField fx:id="urheilupuistoIkkuna" editable="false" layoutX="41.0" layoutY="298.0" prefHeight="31.0" prefWidth="179.0">
+         <font>
+            <Font name="System Bold Italic" size="12.0" />
+         </font></TextField>
+      <TextField fx:id="tapiolaIkkuna" editable="false" layoutX="41.0" layoutY="388.0" prefHeight="31.0" prefWidth="179.0">
+         <font>
+            <Font name="System Bold Italic" size="12.0" />
+         </font></TextField>
+      <TextField fx:id="aaltoIkkuna" editable="false" layoutX="41.0" layoutY="474.0" prefHeight="31.0" prefWidth="179.0">
+         <font>
+            <Font name="System Bold Italic" size="12.0" />
+         </font></TextField>
+      <TextField fx:id="keilaniemiIkkuna" editable="false" layoutX="41.0" layoutY="556.0" prefHeight="31.0" prefWidth="179.0">
+         <font>
+            <Font name="System Bold Italic" size="12.0" />
+         </font></TextField>
+      <TextField fx:id="koivusaariIkkuna" editable="false" layoutX="41.0" layoutY="643.0" prefHeight="31.0" prefWidth="179.0">
+         <font>
+            <Font name="System Bold Italic" size="12.0" />
+         </font></TextField>
+      <TextField fx:id="lauttasaariIkkuna" editable="false" layoutX="41.0" layoutY="721.0" prefHeight="31.0" prefWidth="179.0">
+         <font>
+            <Font name="System Bold Italic" size="12.0" />
+         </font></TextField>
+      <TextArea fx:id="häiriöIkkuna" editable="false" layoutX="234.0" layoutY="219.0" prefHeight="386.0" prefWidth="341.0" promptText="Tervetuloa pelaamaan Länsimetro Simulaattoria!                                                                                                                                     Pelin tarkoitus on saada 14 päivän koe ajo suoritettua ongelmitta sekä mahdollisimman nopeasti että halvalla.                                    Tulet kohtaamaan erilaisia häiriöitä jotka antavat sinulle eri vaihtoehtoja. Voit joko hoitaa asiat tai antaa olla, your choice. Jos annat häiriön olla voit kuitenkin palata myöhemmin hoitamaan sen, joka onnistuu klikkaamalla asemaa jolloin häiriöt listautuvat ja voit valita klikkaamalla häiriön jonka haluat hoitaa. VALITSE VIISAASTI! AINIIN JA ONNEA MATKAAN, TULET TARVITSEMAAN SITÄ! MUAHAHA!                                                                                                                         Rakkaudella: Antti.N AnttiK Heikki.T ja Anssi.C" wrapText="true" />
+      <Label fx:id="matinkyläLabel" layoutX="9.0" layoutY="87.0" onMouseClicked="#handleLabelClick" prefHeight="81.0" prefWidth="215.0" />
+      <Label fx:id="niittykumpuLabel" layoutX="13.0" layoutY="170.0" onMouseClicked="#handleLabelClick" prefHeight="81.0" prefWidth="215.0" />
+      <Label fx:id="urheilupuistoLabel" layoutX="23.0" layoutY="258.0" onMouseClicked="#handleLabelClick" prefHeight="81.0" prefWidth="206.0" />
+      <Label fx:id="tapiolaLabel" layoutX="18.0" layoutY="339.0" onMouseClicked="#handleLabelClick" prefHeight="81.0" prefWidth="206.0" />
+      <Label fx:id="aaltoLabel" layoutX="23.0" layoutY="424.0" onMouseClicked="#handleLabelClick" prefHeight="81.0" prefWidth="206.0" />
+      <Label fx:id="keilaniemiLabel" layoutX="23.0" layoutY="516.0" onMouseClicked="#handleLabelClick" prefHeight="81.0" prefWidth="206.0" />
+      <Label fx:id="koivusaariLabel" layoutX="18.0" layoutY="597.0" onMouseClicked="#handleLabelClick" prefHeight="81.0" prefWidth="206.0" />
+      <Label fx:id="lauttasaariLabel" layoutX="18.0" layoutY="681.0" onMouseClicked="#handleLabelClick" prefHeight="81.0" prefWidth="206.0" />
+      <Button fx:id="vaihto1Nappi" layoutX="233.0" layoutY="627.0" mnemonicParsing="false" onAction="#vaihtoehto1Nappi" prefHeight="87.0" prefWidth="100.0" text="vaihtoehto1" wrapText="true" />
+      <Button fx:id="vaihto2Nappi" layoutX="349.0" layoutY="627.0" mnemonicParsing="false" onAction="#vaihtoehto2Nappi" prefHeight="87.0" prefWidth="100.0" text="vaihtoehto2" wrapText="true" />
+      <Button fx:id="vaihto3Nappi" layoutX="469.0" layoutY="627.0" mnemonicParsing="false" onAction="#vaihtoehto3Nappi" prefHeight="87.0" prefWidth="100.0" text="vaihtoehto3" wrapText="true" />
+   </children>
+</AnchorPane>
