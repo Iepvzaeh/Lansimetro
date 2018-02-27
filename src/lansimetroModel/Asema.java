@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package länsimetroModel;
+package lansimetroModel;
 
 /**
  *
@@ -14,17 +14,17 @@ import java.util.ArrayList;
 public class Asema {
 
     private final String nimi;
-    private ArrayList<KokoHäiriö> häiriöt;
+    private ArrayList<KokoHairio> häiriöt;
 
     public String HäiriötToString() {
         String s = "";
-        for (KokoHäiriö h : häiriöt) {
+        for (KokoHairio h : häiriöt) {
             s = s + h.getNimi() + "\n";
         }
         return s;
     }
 
-    public KokoHäiriö getViimeisinHäiriö() {
+    public KokoHairio getViimeisinHäiriö() {
         if (!häiriöt.isEmpty()) {
             return häiriöt.get(0);
         } else {
@@ -34,7 +34,7 @@ public class Asema {
 
     public boolean onkoAsemallaHäiriö(String häiriönNimi) {
         if (!häiriöt.isEmpty()) {
-            for (KokoHäiriö h : this.häiriöt) {
+            for (KokoHairio h : this.häiriöt) {
                 if (h.getNimi().equals(häiriönNimi)) {
                     return true;
                 }
@@ -43,7 +43,7 @@ public class Asema {
         return false;
     }
 
-    public ArrayList<KokoHäiriö> getHäiriöt() {
+    public ArrayList<KokoHairio> getHäiriöt() {
         return häiriöt;
     }
 
@@ -52,11 +52,11 @@ public class Asema {
         häiriöt = new ArrayList<>();
     }
 
-    public void lisääHäiriö(KokoHäiriö häiriö) {
+    public void lisääHäiriö(KokoHairio häiriö) {
         häiriöt.add(häiriö);
     }
 
-    public boolean poistaHäiriö(KokoHäiriö häiriö) {
+    public boolean poistaHäiriö(KokoHairio häiriö) {
         return häiriöt.remove(häiriö);
     }
 

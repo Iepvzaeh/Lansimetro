@@ -3,12 +3,14 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package länsimetroGui;
+package lansimetroGui;
 
+import lansimetroModel.Hairio;
+import lansimetroModel.KokoHairio;
+import lansimetroModel.Asema;
 import java.util.ArrayList;
 import javax.swing.JOptionPane;
-import länsimetroController.Kontrolleri;
-import länsimetroModel.*;
+import lansimetroController.Kontrolleri;
 
 /**
  *
@@ -52,7 +54,7 @@ public class TestGUI {
                 sb.append("     Ei häiriöitä!");
                 sb.append("\n");
             } else {
-                for (KokoHäiriö kokohäiriö : asema.getHäiriöt()) {
+                for (KokoHairio kokohäiriö : asema.getHäiriöt()) {
                     sb.append("     Häiriö: ").append(kokohäiriö.getNimi());
 
                     int montakoPäivääHoidettavana = kontrolleri.tarkistaOnkoKokoHäiriöHoidossa(kokohäiriö);
@@ -102,12 +104,12 @@ public class TestGUI {
         System.exit(0);
     }
 
-    public void tulostaRatkaisu(Asema asema, Häiriö häiriö) {
+    public void tulostaRatkaisu(Asema asema, Hairio häiriö) {
         JOptionPane.showMessageDialog(null, häiriö.getRatkaisuKuvaus());
     }
 
-    public void tulostaUusiHäiriö(Asema asema, KokoHäiriö kokohäiriö) {
-        ArrayList<Häiriö> häiriöt = kokohäiriö.getKokoHäiriölista();
+    public void tulostaUusiHäiriö(Asema asema, KokoHairio kokohäiriö) {
+        ArrayList<Hairio> häiriöt = kokohäiriö.getKokoHäiriölista();
 
         Object[] vaihtikset = new Object[häiriöt.size()];
 
@@ -143,10 +145,10 @@ public class TestGUI {
 
     
 
-    public String listaaHäiriönRatkaisuVaihtoehdot(KokoHäiriö kokohäiriö) {
+    public String listaaHäiriönRatkaisuVaihtoehdot(KokoHairio kokohäiriö) {
         StringBuilder sb = new StringBuilder();
         sb.append("Vaihtoehdot:").append("\n\n");
-        for (Häiriö häiriö : kokohäiriö.getKokoHäiriölista()) {
+        for (Hairio häiriö : kokohäiriö.getKokoHäiriölista()) {
             sb.append(häiriö.getHäiriöNimi()).append("\n");
             sb.append("Maksaa: ").append(häiriö.getHinta()).append("\n");
             sb.append("Keskeyttää koeajon: ").append(häiriö.isKeskeyttääKoeajon()).append("\n");

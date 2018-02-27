@@ -1,4 +1,4 @@
-package länsimetroModel;
+package lansimetroModel;
 
 import java.util.Calendar;
 

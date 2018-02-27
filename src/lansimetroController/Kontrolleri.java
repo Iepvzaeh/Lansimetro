@@ -3,9 +3,18 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package länsimetroController;
+package lansimetroController;
 
-import länsimetroModel.Pelaaja;
+import lansimetroModel.Hairio;
+import lansimetroModel.KokoHairio;
+import lansimetroModel.Kalenteri;
+import lansimetroModel.Pankki;
+import lansimetroModel.Asemat;
+import lansimetroModel.Hairitsija;
+import lansimetroModel.Pelaajat;
+import lansimetroModel.Koeajo;
+import lansimetroModel.Asema;
+import lansimetroModel.Pelaaja;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -24,7 +33,6 @@ import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import länsimetroModel.*;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -53,11 +61,11 @@ public class Kontrolleri implements Initializable {
     Pelaajat pelaajat;
     Pelaajat pelaajat2;
     Random r = new Random();
-    Häiritsijä häiritsijä;
+    Hairitsija häiritsijä;
     private Kalenteri kalenteri = new Kalenteri();
     private Pankki pankki = new Pankki();
     private Asema viimeisinAsema;
-    private KokoHäiriö viimeisinKokoHäiriö;
+    private KokoHairio viimeisinKokoHäiriö;
     private int valittuAsemaIndeksi = 8;
     private int valittuAsemaVaihtoehto;
     private Koeajo koeajo = new Koeajo();
@@ -71,7 +79,7 @@ public class Kontrolleri implements Initializable {
     public Kontrolleri() {
 
         this.asemat = new Asemat();
-        this.häiritsijä = new Häiritsijä();
+        this.häiritsijä = new Hairitsija();
 
     }
 
@@ -108,7 +116,7 @@ public class Kontrolleri implements Initializable {
             int montakoKertaaYritettiinLuodaHäiriö = 0;
             while (tapahtuiHäiriö == false && montakoKertaaYritettiinLuodaHäiriö < 50) { // yritetään luoda 50 kertaa häiriö
                 asema = asemat.getAsemaLista().get(r.nextInt(asemat.getAsemaLista().size()));
-                KokoHäiriö uusiHäiriö = häiritsijä.luoHäiriö();
+                KokoHairio uusiHäiriö = häiritsijä.luoHäiriö();
 
                 if (!asema.onkoAsemallaHäiriö(uusiHäiriö.getNimi())) {
                     if (asema.getHäiriöt().size() < 3) {
@@ -187,9 +195,9 @@ public class Kontrolleri implements Initializable {
     public int tarkastaOnkoAsemallaHäiriöitä(Asema asema) { // palauttaa 0 jos ei ole, 1 jos on häiriöitä jotka eivät estä koeajoa ja 2 jos on häiriöitä jotka keskeyttää koeajon
 
         if (!asema.getHäiriöt().isEmpty()) {
-            ArrayList<KokoHäiriö> asemanKokoHäiriöt = asema.getHäiriöt();
-            for (KokoHäiriö kokohäiriö : asemanKokoHäiriöt) {
-                for (Häiriö häiriö : kokohäiriö.getKokoHäiriölista()) {
+            ArrayList<KokoHairio> asemanKokoHäiriöt = asema.getHäiriöt();
+            for (KokoHairio kokohäiriö : asemanKokoHäiriöt) {
+                for (Hairio häiriö : kokohäiriö.getKokoHäiriölista()) {
                     if (häiriö.isKeskeyttääKoeajon() && häiriö.isHoidettavana()) {
                         return 2;
                     }
@@ -206,10 +214,10 @@ public class Kontrolleri implements Initializable {
     public void katsoPoistetaankoHäiriöitäAsemilta() {
         for (Asema asema : asemat.getAsemaLista()) {
             if (asema.getHäiriöt() != null) {
-                Iterator<KokoHäiriö> i1 = asema.getHäiriöt().iterator();
+                Iterator<KokoHairio> i1 = asema.getHäiriöt().iterator();
                 while (i1.hasNext()) {
-                    KokoHäiriö kokohäiriö = i1.next();
-                    for (Häiriö häiriö : kokohäiriö.getKokoHäiriölista()) {
+                    KokoHairio kokohäiriö = i1.next();
+                    for (Hairio häiriö : kokohäiriö.getKokoHäiriölista()) {
                         if (häiriö.isHoidettavana()) {
                             häiriö.vähennäPäiviä();
 
@@ -225,12 +233,12 @@ public class Kontrolleri implements Initializable {
         }
     }
 
-    public void asetaKokoHäiriöHoitumaanLopullisesti(KokoHäiriö kokohäiriö) {
+    public void asetaKokoHäiriöHoitumaanLopullisesti(KokoHairio kokohäiriö) {
         kokohäiriö.setHäiriöHoitumassa(true);
     }
 
-    public int tarkistaOnkoKokoHäiriöHoidossa(KokoHäiriö kokohäiriö) { // palauttaa montako päivää kestää hoitaa kokohäiriö (jos se on hoidossa), muuten palauttaa 0
-        for (Häiriö häiriö : kokohäiriö.getKokoHäiriölista()) {
+    public int tarkistaOnkoKokoHäiriöHoidossa(KokoHairio kokohäiriö) { // palauttaa montako päivää kestää hoitaa kokohäiriö (jos se on hoidossa), muuten palauttaa 0
+        for (Hairio häiriö : kokohäiriö.getKokoHäiriölista()) {
             if (häiriö.isHoidettavana()) {
                 return häiriö.getPäivätHoitamiseen();
             }
@@ -239,12 +247,12 @@ public class Kontrolleri implements Initializable {
 
     }
 
-    public ArrayList<Asema> tarkistaOnkoHäiriö(KokoHäiriö haettavaHäiriö) {//palauttaa listan asemista, jotka eivät sisällä annettua kokohäiriötä
+    public ArrayList<Asema> tarkistaOnkoHäiriö(KokoHairio haettavaHäiriö) {//palauttaa listan asemista, jotka eivät sisällä annettua kokohäiriötä
         ArrayList<Asema> asemalista = new ArrayList<>();
         boolean sisältää = false;
         for (Asema asema : asemat.getAsemaLista()) {
             sisältää = false;
-            for (KokoHäiriö kokohäiriö : asema.getHäiriöt()) {
+            for (KokoHairio kokohäiriö : asema.getHäiriöt()) {
                 if (haettavaHäiriö.getNimi().equals(kokohäiriö.getNimi())) {
                     sisältää = true;
                 }
@@ -264,12 +272,12 @@ public class Kontrolleri implements Initializable {
         
         for (Asema asema : asemat.getAsemaLista()) {
 
-            Iterator<KokoHäiriö> kokoHäiriöIteraattori = asema.getHäiriöt().iterator();
+            Iterator<KokoHairio> kokoHäiriöIteraattori = asema.getHäiriöt().iterator();
             
             while (kokoHäiriöIteraattori.hasNext()) {
-                KokoHäiriö kokohäiriö = kokoHäiriöIteraattori.next();
+                KokoHairio kokohäiriö = kokoHäiriöIteraattori.next();
 
-                for (Häiriö häiriö : kokohäiriö.getKokoHäiriölista()) {
+                for (Hairio häiriö : kokohäiriö.getKokoHäiriölista()) {
                     switch (häiriö.getPäivätHoitamiseen()) {
                         case -1: // voi eskaloitua milloin vain, häiriö kopioituu toiselle asemalle
                             if ((int) (r.nextDouble() * 100) >= 100 - häiriönEskalaatioMahdollisuus) {
@@ -314,11 +322,11 @@ public class Kontrolleri implements Initializable {
         return eskaloitui;
     }
 
-    public void poistaAsemaltaHäiriö(Asema asema, KokoHäiriö kokohäiriö) {
+    public void poistaAsemaltaHäiriö(Asema asema, KokoHairio kokohäiriö) {
         asema.poistaHäiriö(kokohäiriö);
     }
 
-    public void teeHoidettavaksi(Häiriö häiriö) {
+    public void teeHoidettavaksi(Hairio häiriö) {
         häiriö.setHoidettavana(true);
     }
 
@@ -462,7 +470,7 @@ public class Kontrolleri implements Initializable {
                 lauttasaariIkkuna.setText("EI HÄIRIÖITÄ");
 
             } else {
-                for (KokoHäiriö kokohäiriö : asema.getHäiriöt()) {
+                for (KokoHairio kokohäiriö : asema.getHäiriöt()) {
                     if (asema.getNimi().equals("Matinkylä")) {
                         matinkyläIkkuna.setText("Häiriö: " + kokohäiriö.getNimi());
                     }
@@ -520,12 +528,12 @@ public class Kontrolleri implements Initializable {
         }
     }
 
-    public void tulostaRatkaisu(Asema asema, Häiriö häiriö) {
+    public void tulostaRatkaisu(Asema asema, Hairio häiriö) {
         häiriöIkkuna.setText(häiriö.getRatkaisuKuvaus());
     }
 
-    public void tulostaUusiHäiriö(Asema asema, KokoHäiriö kokohäiriö) {
-        ArrayList<Häiriö> häiriöt = kokohäiriö.getKokoHäiriölista();
+    public void tulostaUusiHäiriö(Asema asema, KokoHairio kokohäiriö) {
+        ArrayList<Hairio> häiriöt = kokohäiriö.getKokoHäiriölista();
         viimeisinAsema = asema;
         viimeisinKokoHäiriö = kokohäiriö;
 
@@ -557,10 +565,10 @@ public class Kontrolleri implements Initializable {
         }
     }
 
-    public String listaaHäiriönRatkaisuVaihtoehdot(KokoHäiriö kokohäiriö) {
+    public String listaaHäiriönRatkaisuVaihtoehdot(KokoHairio kokohäiriö) {
         StringBuilder sb = new StringBuilder();
         sb.append("Vaihtoehdot:").append("\n\n");
-        for (Häiriö häiriö : kokohäiriö.getKokoHäiriölista()) {
+        for (Hairio häiriö : kokohäiriö.getKokoHäiriölista()) {
             sb.append(häiriö.getHäiriöNimi()).append("\n");
             sb.append("Maksaa: ").append(häiriö.getHinta()).append(" €\n");
             //sb.append("Keskeyttää koeajon: ").append(häiriö.isKeskeyttääKoeajon()).append("\n");
@@ -685,10 +693,10 @@ public class Kontrolleri implements Initializable {
             valittuAsemaVaihtoehto = 0;
 
             Asema asema = asemat.getAsemaLista().get(valittuAsemaIndeksi);
-            KokoHäiriö kokohäiriö = asema.getHäiriöt().get(valittuAsemaVaihtoehto);
+            KokoHairio kokohäiriö = asema.getHäiriöt().get(valittuAsemaVaihtoehto);
             viimeisinKokoHäiriö = kokohäiriö;
             viimeisinAsema = asema;
-            ArrayList<Häiriö> häiriöt = kokohäiriö.getKokoHäiriölista();
+            ArrayList<Hairio> häiriöt = kokohäiriö.getKokoHäiriölista();
             häiriöIkkuna.setText("Aseman " + asema + " häiriö\n" + kokohäiriö.getKuvaus() + "\n" + listaaHäiriönRatkaisuVaihtoehdot(kokohäiriö));
             vaihto1Nappi.setText("");
             vaihto2Nappi.setText("");
@@ -732,10 +740,10 @@ public class Kontrolleri implements Initializable {
             valittuAsemaVaihtoehto = 1;
 
             Asema asema = asemat.getAsemaLista().get(valittuAsemaIndeksi);
-            KokoHäiriö kokohäiriö = asema.getHäiriöt().get(valittuAsemaVaihtoehto);
+            KokoHairio kokohäiriö = asema.getHäiriöt().get(valittuAsemaVaihtoehto);
             viimeisinKokoHäiriö = kokohäiriö;
             viimeisinAsema = asema;
-            ArrayList<Häiriö> häiriöt = kokohäiriö.getKokoHäiriölista();
+            ArrayList<Hairio> häiriöt = kokohäiriö.getKokoHäiriölista();
             häiriöIkkuna.setText("Aseman " + asema + " häiriö\n" + kokohäiriö.getKuvaus() + "\n" + listaaHäiriönRatkaisuVaihtoehdot(kokohäiriö));
             vaihto1Nappi.setText("");
             vaihto2Nappi.setText("");
@@ -779,10 +787,10 @@ public class Kontrolleri implements Initializable {
             valittuAsemaVaihtoehto = 2;
 
             Asema asema = asemat.getAsemaLista().get(valittuAsemaIndeksi);
-            KokoHäiriö kokohäiriö = asema.getHäiriöt().get(valittuAsemaVaihtoehto);
+            KokoHairio kokohäiriö = asema.getHäiriöt().get(valittuAsemaVaihtoehto);
             viimeisinKokoHäiriö = kokohäiriö;
             viimeisinAsema = asema;
-            ArrayList<Häiriö> häiriöt = kokohäiriö.getKokoHäiriölista();
+            ArrayList<Hairio> häiriöt = kokohäiriö.getKokoHäiriölista();
             häiriöIkkuna.setText("Aseman " + asema + " häiriön" + kokohäiriö.getKuvaus() + "\n" + listaaHäiriönRatkaisuVaihtoehdot(kokohäiriö));
             vaihto1Nappi.setText("");
             vaihto2Nappi.setText("");
@@ -813,7 +821,7 @@ public class Kontrolleri implements Initializable {
 
     }
 
-    private void hoidaAsemallaOlevaOngelma(Häiriö häiriö) {
+    private void hoidaAsemallaOlevaOngelma(Hairio häiriö) {
         tulostaRatkaisu(viimeisinAsema, häiriö);
         if (häiriö.getPäivätHoitamiseen() <= 0) {
 
@@ -827,7 +835,7 @@ public class Kontrolleri implements Initializable {
                             koeajon keskeyttäväksi häiriöksi
                  */
 
-                for (Häiriö h : viimeisinKokoHäiriö.getKokoHäiriölista()) {
+                for (Hairio h : viimeisinKokoHäiriö.getKokoHäiriölista()) {
                     h.setValittu(false); // ettei kaksi häiriötä ole samaan aikaan valittuna
                 }
                 häiriö.setValittu(true);
@@ -866,7 +874,7 @@ public class Kontrolleri implements Initializable {
                     vaihto3Nappi.setDisable(true);
                     häiriöIkkuna.setText("EI HÄIRIÖITÄ");
                 } else if (asema.getNimi().equals("Matinkylä")) {
-                    for (KokoHäiriö kokohäiriö : asemat.haeAsema("Matinkylä").getHäiriöt()) {
+                    for (KokoHairio kokohäiriö : asemat.haeAsema("Matinkylä").getHäiriöt()) {
                         sb.append(kokohäiriö.getNimi());
                         sb.append("\n");
                     }
@@ -913,7 +921,7 @@ public class Kontrolleri implements Initializable {
                     häiriöIkkuna.setText("EI HÄIRIÖITÄ");
                 } else if (asema.getNimi().equals("Niittykumpu")) {
 
-                    for (KokoHäiriö kokohäiriö : asemat.haeAsema("Niittykumpu").getHäiriöt()) {
+                    for (KokoHairio kokohäiriö : asemat.haeAsema("Niittykumpu").getHäiriöt()) {
                         sb.append(kokohäiriö.getNimi());
                         sb.append("\n");
                     }
@@ -958,7 +966,7 @@ public class Kontrolleri implements Initializable {
                     vaihto3Nappi.setDisable(true);
                     häiriöIkkuna.setText("EI HÄIRIÖITÄ");
                 } else if (asema.getNimi().equals("Urheilupuisto")) {
-                    for (KokoHäiriö kokohäiriö : asemat.haeAsema("Urheilupuisto").getHäiriöt()) {
+                    for (KokoHairio kokohäiriö : asemat.haeAsema("Urheilupuisto").getHäiriöt()) {
                         sb.append(kokohäiriö.getNimi());
                         sb.append("\n");
                     }
@@ -1003,7 +1011,7 @@ public class Kontrolleri implements Initializable {
                     vaihto3Nappi.setDisable(true);
                     häiriöIkkuna.setText("EI HÄIRIÖITÄ");
                 } else if (asema.getNimi().equals("Tapiola")) {
-                    for (KokoHäiriö kokohäiriö : asemat.haeAsema("Tapiola").getHäiriöt()) {
+                    for (KokoHairio kokohäiriö : asemat.haeAsema("Tapiola").getHäiriöt()) {
                         sb.append(kokohäiriö.getNimi());
                         sb.append("\n");
                     }
@@ -1048,7 +1056,7 @@ public class Kontrolleri implements Initializable {
                     vaihto3Nappi.setDisable(true);
                     häiriöIkkuna.setText("EI HÄIRIÖITÄ");
                 } else if (asema.getNimi().equals("Aalto-yliopisto")) {
-                    for (KokoHäiriö kokohäiriö : asemat.haeAsema("Aalto-yliopisto").getHäiriöt()) {
+                    for (KokoHairio kokohäiriö : asemat.haeAsema("Aalto-yliopisto").getHäiriöt()) {
                         sb.append(kokohäiriö.getNimi());
                         sb.append("\n");
                     }
@@ -1093,7 +1101,7 @@ public class Kontrolleri implements Initializable {
                     vaihto3Nappi.setDisable(true);
                     häiriöIkkuna.setText("EI HÄIRIÖITÄ");
                 } else if (asema.getNimi().equals("Keilaniemi")) {
-                    for (KokoHäiriö kokohäiriö : asemat.haeAsema("Keilaniemi").getHäiriöt()) {
+                    for (KokoHairio kokohäiriö : asemat.haeAsema("Keilaniemi").getHäiriöt()) {
                         sb.append(kokohäiriö.getNimi());
                         sb.append("\n");
                     }
@@ -1138,7 +1146,7 @@ public class Kontrolleri implements Initializable {
                     vaihto3Nappi.setDisable(true);
                     häiriöIkkuna.setText("EI HÄIRIÖITÄ");
                 } else if (asema.getNimi().equals("Koivusaari")) {
-                    for (KokoHäiriö kokohäiriö : asemat.haeAsema("Koivusaari").getHäiriöt()) {
+                    for (KokoHairio kokohäiriö : asemat.haeAsema("Koivusaari").getHäiriöt()) {
                         sb.append(kokohäiriö.getNimi());
                         sb.append("\n");
                     }
@@ -1183,7 +1191,7 @@ public class Kontrolleri implements Initializable {
                     vaihto3Nappi.setDisable(true);
                     häiriöIkkuna.setText("EI HÄIRIÖITÄ");
                 } else if (asema.getNimi().equals("Lauttasaari")) {
-                    for (KokoHäiriö kokohäiriö : asemat.haeAsema("Lauttasaari").getHäiriöt()) {
+                    for (KokoHairio kokohäiriö : asemat.haeAsema("Lauttasaari").getHäiriöt()) {
                         sb.append(kokohäiriö.getNimi());
                         sb.append("\n");
                     }

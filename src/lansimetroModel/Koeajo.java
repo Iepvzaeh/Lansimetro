@@ -1,5 +1,5 @@
 
-package länsimetroModel;
+package lansimetroModel;
 
 /**
  *

@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package länsimetroModel;
+package lansimetroModel;
 
 import java.util.ArrayList;
 
@@ -11,25 +11,25 @@ import java.util.ArrayList;
  *
  * @author Antti Käyhkö
  */
-public class KokoHäiriö {
+public class KokoHairio {
 
     private final String nimi;
     private final String kuvaus;
-    private ArrayList<Häiriö> kokoHäiriölista;
+    private ArrayList<Hairio> kokoHäiriölista;
     private boolean häiriöHoitumassa = false;
 
-    public KokoHäiriö(String nimi, String kuvaus) {
+    public KokoHairio(String nimi, String kuvaus) {
         this.kokoHäiriölista = new ArrayList();
         this.nimi = nimi;
         this.kuvaus = kuvaus;
     }
 
-    public KokoHäiriö(KokoHäiriö kokohäiriö) { // luodaan kopio kokohäiriöstä ja sen häiriöistä
+    public KokoHairio(KokoHairio kokohäiriö) { // luodaan kopio kokohäiriöstä ja sen häiriöistä
         this.nimi = kokohäiriö.nimi;
         this.kuvaus = kokohäiriö.kuvaus;
         this.kokoHäiriölista = new ArrayList();
-        for (Häiriö h : kokohäiriö.getKokoHäiriölista()) {
-            this.kokoHäiriölista.add(new Häiriö(h));
+        for (Hairio h : kokohäiriö.getKokoHäiriölista()) {
+            this.kokoHäiriölista.add(new Hairio(h));
 
         }
     }
@@ -42,7 +42,7 @@ public class KokoHäiriö {
         this.häiriöHoitumassa = häiriöHoitumassa;
     }
 
-    public void lisääVaihtoehdot(Häiriö h) {
+    public void lisääVaihtoehdot(Hairio h) {
         this.kokoHäiriölista.add(h);
     }
 
@@ -54,7 +54,7 @@ public class KokoHäiriö {
         return kuvaus;
     }
 
-    public ArrayList<Häiriö> getKokoHäiriölista() {
+    public ArrayList<Hairio> getKokoHäiriölista() {
         return kokoHäiriölista;
     }
 

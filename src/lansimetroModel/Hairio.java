@@ -3,13 +3,13 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package länsimetroModel;
+package lansimetroModel;
 
 /**
  *
  * @author Antti Käyhkö
  */
-public class Häiriö {
+public class Hairio {
 
     private final int hinta;
     private final String häiriöNimi;
@@ -21,7 +21,7 @@ public class Häiriö {
     private boolean hoidettavana;
     private boolean valittu;
 
-    public Häiriö(int hinta, String häiriöNimi, String kuvaus, int päivätHoitamiseen, String ratkaisuKuvaus, boolean keskeyttääKoeajon, boolean poistaaKokoHäiriön) {
+    public Hairio(int hinta, String häiriöNimi, String kuvaus, int päivätHoitamiseen, String ratkaisuKuvaus, boolean keskeyttääKoeajon, boolean poistaaKokoHäiriön) {
         this.hinta = hinta;
         this.häiriöNimi = häiriöNimi;
         this.kuvaus = kuvaus;
@@ -33,7 +33,7 @@ public class Häiriö {
         this.valittu = false;
     }
 
-    public Häiriö(Häiriö h) { // luodaan kopio häiriöstä
+    public Hairio(Hairio h) { // luodaan kopio häiriöstä
         this.hinta = h.hinta;
         this.häiriöNimi = h.häiriöNimi;
         this.kuvaus = h.kuvaus;
