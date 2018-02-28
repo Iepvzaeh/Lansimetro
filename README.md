@@ -4,4 +4,4 @@ Länsimetro is a Finnish simulation game of the final stages of the infamous Lä
 
 [[https://github.com/Iepvzaeh/Lansimetro/Lansimetro.png]]
 
-![alt text](https://github.com/Iepvzaeh/Lansimetro/Lansimetro.png)
+![alt text](https://github.com/Iepvzaeh/Lansimetro/Lansimetro.png "Screenshot")
