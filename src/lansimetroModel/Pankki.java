@@ -1,13 +1,8 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package lansimetroModel;
 
 /**
  *
- * @author Antti Käyhkö
+ * @author Antti Nieminen, Antti Käyhkö, Anssi Chamorro, Heikki Tanttu
  */
 public class Pankki {
     private int käytettyRaha;

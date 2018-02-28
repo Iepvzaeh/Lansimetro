@@ -2,6 +2,10 @@ package lansimetroModel;
 
 import java.util.Calendar;
 
+/**
+ *
+ * @author Antti Nieminen, Antti Käyhkö, Anssi Chamorro, Heikki Tanttu
+ */
 public class Kalenteri {
 
     private Calendar kalenteri = Calendar.getInstance();

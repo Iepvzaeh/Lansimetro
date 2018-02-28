@@ -1,15 +1,10 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package lansimetroModel;
 
 import java.util.ArrayList;
 
 /**
  *
- * @author Antti Käyhkö
+ * @author Antti Nieminen, Antti Käyhkö, Anssi Chamorro, Heikki Tanttu
  */
 public class Asemat {
     ArrayList<Asema> asemaLista;

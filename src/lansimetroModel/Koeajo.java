@@ -1,9 +1,8 @@
-
 package lansimetroModel;
 
 /**
  *
- * @author Hodor
+ * @author Antti Nieminen, Antti Käyhkö, Anssi Chamorro, Heikki Tanttu
  */
 public class Koeajo {
     
