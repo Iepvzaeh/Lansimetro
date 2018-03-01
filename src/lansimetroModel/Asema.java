@@ -63,5 +63,4 @@ public class Asema {
     public String toString() {
         return nimi;
     }
-
 }

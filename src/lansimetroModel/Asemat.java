@@ -34,4 +34,8 @@ public class Asemat {
         }
         return null;
     }
+    
+    public int indexOf(String asemaNimi) {
+        return asemaLista.indexOf(haeAsema(asemaNimi));        
+    }
 }

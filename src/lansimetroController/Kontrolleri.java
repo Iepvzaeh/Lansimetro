@@ -28,7 +28,6 @@ import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -53,10 +52,10 @@ public class Kontrolleri implements Initializable {
     private final int häiriönEskalaatioMahdollisuus = 5;
     private final int päiväRaha = 50000;
     private final Asemat asemat;
-    Pelaajat pelaajat;
-    Pelaajat pelaajat2;
-    Random r = new Random();
-    Hairitsija häiritsijä;
+    private Pelaajat pelaajat;
+    private Pelaajat pelaajat2;
+    private Random r = new Random();
+    private Hairitsija häiritsijä;
     private Kalenteri kalenteri = new Kalenteri();
     private Pankki pankki = new Pankki();
     private Asema viimeisinAsema;
@@ -76,6 +75,17 @@ public class Kontrolleri implements Initializable {
         this.asemat = new Asemat();
         this.häiritsijä = new Hairitsija();
 
+    }
+
+    public void asetaLabelIdt() {
+        matinkyläLabel.setId("Matinkylä");
+        niittykumpuLabel.setId("Niittykumpu");
+        urheilupuistoLabel.setId("Urheilupuisto");
+        tapiolaLabel.setId("Tapiola");
+        aaltoLabel.setId("Aalto-yliopisto");
+        keilaniemiLabel.setId("Keilaniemi");
+        koivusaariLabel.setId("Koivusaari");
+        lauttasaariLabel.setId("Lauttasaari");
     }
 
     public boolean etenePäivä() {
@@ -129,9 +139,9 @@ public class Kontrolleri implements Initializable {
             tapahtuiHäiriö = true;
         }
         listaaAsematJaHäiriöt();
-        
+
         valittuAsemaIndeksi = 8;
-        
+
         return tapahtuiHäiriö;
     }
 
@@ -263,12 +273,11 @@ public class Kontrolleri implements Initializable {
     public boolean tarkistaEskalaatio() {
         boolean eskaloitui = false;
         ArrayList<Asema> mahdollinenAsema = new ArrayList();
-        
-        
+
         for (Asema asema : asemat.getAsemaLista()) {
 
             Iterator<KokoHairio> kokoHäiriöIteraattori = asema.getHäiriöt().iterator();
-            
+
             while (kokoHäiriöIteraattori.hasNext()) {
                 KokoHairio kokohäiriö = kokoHäiriöIteraattori.next();
 
@@ -287,9 +296,9 @@ public class Kontrolleri implements Initializable {
                             break;
                         case -2: // voi eskaloitua vain kun koeajo on käynnissä, häiriö muuttuu muuksi
                             if (koeajo.isKäynnissä()) {
-                                if ((int) (r.nextDouble() * 100) >= 100 - häiriönEskalaatioMahdollisuus) {                                    
+                                if ((int) (r.nextDouble() * 100) >= 100 - häiriönEskalaatioMahdollisuus) {
                                     kokoHäiriöIteraattori.remove();
-                                    poistaAsemaltaHäiriö(asema, kokohäiriö);                                    
+                                    poistaAsemaltaHäiriö(asema, kokohäiriö);
                                     asema.lisääHäiriö(häiritsijä.luoSpesifiEskaloitunutHäiriö(kokohäiriö));
                                     kokoHäiriöIteraattori = asema.getHäiriöt().iterator();
                                     tulostaUusiHäiriö(asema, asema.getViimeisinHäiriö());
@@ -580,6 +589,68 @@ public class Kontrolleri implements Initializable {
         return sb.toString();
     }
 
+    private void valitseOlemassaOlevaHairio(int valittuAsemaVaihtoehto) {
+        Asema asema = asemat.getAsemaLista().get(valittuAsemaIndeksi);
+        KokoHairio kokohäiriö = asema.getHäiriöt().get(valittuAsemaVaihtoehto);
+        viimeisinKokoHäiriö = kokohäiriö;
+        viimeisinAsema = asema;
+        ArrayList<Hairio> häiriöt = kokohäiriö.getKokoHäiriölista();
+        häiriöIkkuna.setText("Aseman " + asema + " häiriö\n" + kokohäiriö.getKuvaus() + "\n" + listaaHäiriönRatkaisuVaihtoehdot(kokohäiriö));
+        vaihto1Nappi.setText("");
+        vaihto2Nappi.setText("");
+        vaihto3Nappi.setText("");
+        if (häiriöt.size() >= 1) {
+            vaihto1Nappi.setDisable(false);
+            vaihto1Nappi.setText(häiriöt.get(0).getHäiriöNimi());
+        }
+        if (häiriöt.size() >= 2) {
+            vaihto2Nappi.setDisable(false);
+            vaihto2Nappi.setText(häiriöt.get(1).getHäiriöNimi());
+            vaihto3Nappi.setDisable(true);
+            vaihto3Nappi.setText("");
+        }
+        if (häiriöt.size() == 3) {
+            vaihto3Nappi.setDisable(false);
+            vaihto3Nappi.setText(häiriöt.get(2).getHäiriöNimi());
+        }
+
+        päiväNappi.setDisable(true);
+        viikkoNappi.setDisable(true);
+        koeajoNappi.setDisable(true);
+    }
+
+    private void hoidaAsemallaOlevaOngelma(Hairio häiriö) {
+        tulostaRatkaisu(viimeisinAsema, häiriö);
+        if (häiriö.getPäivätHoitamiseen() <= 0) {
+
+            if (häiriö.isPoistaaKokoHäiriön()) {
+                poistaAsemaltaHäiriö(viimeisinAsema, viimeisinKokoHäiriö);
+            }
+
+            if (häiriö.isKeskeyttääKoeajon()) {
+                /* jos valittu häiriö keskeyttää koeajon mutta vaatii toisen
+                            valinnan ratkaisuksi, valitaan häiriö jotta asema tunnistaa sen 
+                            koeajon keskeyttäväksi häiriöksi
+                 */
+
+                for (Hairio h : viimeisinKokoHäiriö.getKokoHäiriölista()) {
+                    h.setValittu(false); // ettei kaksi häiriötä ole samaan aikaan valittuna
+                }
+                häiriö.setValittu(true);
+            }
+
+        } else {
+            teeHoidettavaksi(häiriö);
+        }
+        lisääRaha(häiriö.getHinta());
+
+        päiväNappi.setDisable(false);
+        viikkoNappi.setDisable(false);
+        vaihto1Nappi.setDisable(true);
+        vaihto2Nappi.setDisable(true);
+        vaihto3Nappi.setDisable(true);
+    }
+
     public void lisääJaTulostaHighScore() throws FileNotFoundException {
 
         JFrame frame = new JFrame("InputDialog Example #1");
@@ -626,28 +697,17 @@ public class Kontrolleri implements Initializable {
         ArrayList<Pelaaja> pelaajatPisteidenMukaan = pelaajat2.getSortedPelaajatByPiste();
         häiriöIkkuna.getText();
         String s = "";
-        String highscore = "Onnittelut " + nimi + "! Koeajo onnistui!\nSinulla meni " + Integer.toString(points) + " päivää ja rahaa kului VAIN " + Integer.toString(menetettyraha) + " euroa \n\nParhaiten simuloineet TOP-"+pelaajatPisteidenMukaan.size()+"\n\n";
+        String highscore = "Onnittelut " + nimi + "! Koeajo onnistui!\nSinulla meni " + Integer.toString(points) + " päivää ja rahaa kului VAIN " + Integer.toString(menetettyraha) + " euroa \n\nParhaiten simuloineet TOP-" + pelaajatPisteidenMukaan.size() + "\n\n";
         int lopeta = 0;
         for (int i = 0; i < pelaajatPisteidenMukaan.size(); i++) {
-            s= (""+Integer.toString(i+1)+". "+pelaajatPisteidenMukaan.get(i).getNimi() + "\npäivät: " + pelaajatPisteidenMukaan.get(i).getPisteet() + " rahat: " + pelaajatPisteidenMukaan.get(i).getRahat()+"\n");
-            highscore += s+"\n";
+            s = ("" + Integer.toString(i + 1) + ". " + pelaajatPisteidenMukaan.get(i).getNimi() + "\npäivät: " + pelaajatPisteidenMukaan.get(i).getPisteet() + " rahat: " + pelaajatPisteidenMukaan.get(i).getRahat() + "\n");
+            highscore += s + "\n";
             lopeta++;
             if (lopeta == 50) {
                 break;
             }
         }
         häiriöIkkuna.setText(highscore);
-        /*häiriöIkkuna.setText("Onnittelut " + nimi + "! Koeajo onnistui!\nSinulla meni " + Integer.toString(points) + " päivää ja rahaa kului VAIN " + Integer.toString(menetettyraha) + " euroa \n\nParhaiten simuloineet TOP 10:"
-                + "\n\n1. " + pelaajatPisteidenMukaan.get(0).getNimi() + "\npäivät: " + pelaajatPisteidenMukaan.get(0).getPisteet() + " rahat: " + pelaajatPisteidenMukaan.get(0).getRahat()
-                + "\n2. " + pelaajatPisteidenMukaan.get(1).getNimi() + "\npäivät: " + pelaajatPisteidenMukaan.get(1).getPisteet() + " rahat: " + pelaajatPisteidenMukaan.get(1).getRahat()
-                + "\n3. " + pelaajatPisteidenMukaan.get(2).getNimi() + "\npäivät: " + pelaajatPisteidenMukaan.get(2).getPisteet() + " rahat: " + pelaajatPisteidenMukaan.get(2).getRahat()
-                + "\n4. " + pelaajatPisteidenMukaan.get(3).getNimi() + "\npäivät: " + pelaajatPisteidenMukaan.get(3).getPisteet() + " rahat: " + pelaajatPisteidenMukaan.get(3).getRahat()
-                + "\n5. " + pelaajatPisteidenMukaan.get(4).getNimi() + "\npäivät: " + pelaajatPisteidenMukaan.get(4).getPisteet() + " rahat: " + pelaajatPisteidenMukaan.get(4).getRahat()
-                + "\n6. " + pelaajatPisteidenMukaan.get(5).getNimi() + "\npäivät: " + pelaajatPisteidenMukaan.get(5).getPisteet() + " rahat: " + pelaajatPisteidenMukaan.get(5).getRahat()
-                + "\n7. " + pelaajatPisteidenMukaan.get(6).getNimi() + "\npäivät: " + pelaajatPisteidenMukaan.get(6).getPisteet() + " rahat: " + pelaajatPisteidenMukaan.get(6).getRahat()
-                + "\n8. " + pelaajatPisteidenMukaan.get(7).getNimi() + "\npäivät: " + pelaajatPisteidenMukaan.get(7).getPisteet() + " rahat: " + pelaajatPisteidenMukaan.get(7).getRahat()
-                + "\n9. " + pelaajatPisteidenMukaan.get(8).getNimi() + "\npäivät: " + pelaajatPisteidenMukaan.get(8).getPisteet() + " rahat: " + pelaajatPisteidenMukaan.get(8).getRahat()
-                + "\n10. " + pelaajatPisteidenMukaan.get(9).getNimi() + "\npäivät: " + pelaajatPisteidenMukaan.get(9).getPisteet() + " rahat: " + pelaajatPisteidenMukaan.get(9).getRahat());*/
     }
 
     @FXML
@@ -681,171 +741,42 @@ public class Kontrolleri implements Initializable {
     private void vaihtoehto1Nappi(ActionEvent event) {
         if (valittuAsemaIndeksi == 8) {
             hoidaAsemallaOlevaOngelma(viimeisinKokoHäiriö.getKokoHäiriölista().get(0));
-            listaaAsematJaHäiriöt();
-            
         }
         if (valittuAsemaIndeksi < 8) {
             valittuAsemaVaihtoehto = 0;
-
-            Asema asema = asemat.getAsemaLista().get(valittuAsemaIndeksi);
-            KokoHairio kokohäiriö = asema.getHäiriöt().get(valittuAsemaVaihtoehto);
-            viimeisinKokoHäiriö = kokohäiriö;
-            viimeisinAsema = asema;
-            ArrayList<Hairio> häiriöt = kokohäiriö.getKokoHäiriölista();
-            häiriöIkkuna.setText("Aseman " + asema + " häiriö\n" + kokohäiriö.getKuvaus() + "\n" + listaaHäiriönRatkaisuVaihtoehdot(kokohäiriö));
-            vaihto1Nappi.setText("");
-            vaihto2Nappi.setText("");
-            vaihto3Nappi.setText("");
-            if (häiriöt.size() >= 1) {
-                vaihto1Nappi.setDisable(false);
-                vaihto1Nappi.setText(häiriöt.get(0).getHäiriöNimi());
-            }
-            if (häiriöt.size() >= 2) {
-                vaihto2Nappi.setDisable(false);
-
-                vaihto2Nappi.setText(häiriöt.get(1).getHäiriöNimi());
-                vaihto3Nappi.setDisable(true);
-                vaihto3Nappi.setText("");
-            }
-            if (häiriöt.size() == 3) {
-                vaihto3Nappi.setDisable(false);
-                vaihto3Nappi.setText(häiriöt.get(2).getHäiriöNimi());
-            }
-
-            päiväNappi.setDisable(true);
-            viikkoNappi.setDisable(true);
-            koeajoNappi.setDisable(true);
-
-            listaaAsematJaHäiriöt();
+            valitseOlemassaOlevaHairio(valittuAsemaVaihtoehto);
             valittuAsemaIndeksi = 8;
         }
-
+        listaaAsematJaHäiriöt();
     }
 
     @FXML
     private void vaihtoehto2Nappi(ActionEvent event) {
         if (valittuAsemaIndeksi == 8) {
-            
             hoidaAsemallaOlevaOngelma(viimeisinKokoHäiriö.getKokoHäiriölista().get(1));
-            listaaAsematJaHäiriöt();
-            
-            
         }
         if (valittuAsemaIndeksi < 8) {
             valittuAsemaVaihtoehto = 1;
-
-            Asema asema = asemat.getAsemaLista().get(valittuAsemaIndeksi);
-            KokoHairio kokohäiriö = asema.getHäiriöt().get(valittuAsemaVaihtoehto);
-            viimeisinKokoHäiriö = kokohäiriö;
-            viimeisinAsema = asema;
-            ArrayList<Hairio> häiriöt = kokohäiriö.getKokoHäiriölista();
-            häiriöIkkuna.setText("Aseman " + asema + " häiriö\n" + kokohäiriö.getKuvaus() + "\n" + listaaHäiriönRatkaisuVaihtoehdot(kokohäiriö));
-            vaihto1Nappi.setText("");
-            vaihto2Nappi.setText("");
-            vaihto3Nappi.setText("");
-            if (häiriöt.size() >= 1) {
-                vaihto1Nappi.setDisable(false);
-                vaihto1Nappi.setText(häiriöt.get(0).getHäiriöNimi());
-            }
-            if (häiriöt.size() >= 2) {
-                vaihto2Nappi.setDisable(false);
-                vaihto2Nappi.setText(häiriöt.get(1).getHäiriöNimi());
-                vaihto3Nappi.setDisable(true);
-                vaihto3Nappi.setText("");
-            }
-            if (häiriöt.size() == 3) {
-                vaihto3Nappi.setDisable(false);
-                vaihto3Nappi.setText(häiriöt.get(2).getHäiriöNimi());
-            }
-
-            päiväNappi.setDisable(true);
-            viikkoNappi.setDisable(true);
-            koeajoNappi.setDisable(true);
-
-            listaaAsematJaHäiriöt();
+            valitseOlemassaOlevaHairio(valittuAsemaVaihtoehto);
             valittuAsemaIndeksi = 8;
-
         }
+        listaaAsematJaHäiriöt();
 
     }
 
     @FXML
     private void vaihtoehto3Nappi(ActionEvent event) {
         if (valittuAsemaIndeksi == 8) {
-            
             hoidaAsemallaOlevaOngelma(viimeisinKokoHäiriö.getKokoHäiriölista().get(2));
-            listaaAsematJaHäiriöt();
-            
-            
+
         }
         if (valittuAsemaIndeksi < 8) {
             valittuAsemaVaihtoehto = 2;
-
-            Asema asema = asemat.getAsemaLista().get(valittuAsemaIndeksi);
-            KokoHairio kokohäiriö = asema.getHäiriöt().get(valittuAsemaVaihtoehto);
-            viimeisinKokoHäiriö = kokohäiriö;
-            viimeisinAsema = asema;
-            ArrayList<Hairio> häiriöt = kokohäiriö.getKokoHäiriölista();
-            häiriöIkkuna.setText("Aseman " + asema + " häiriön" + kokohäiriö.getKuvaus() + "\n" + listaaHäiriönRatkaisuVaihtoehdot(kokohäiriö));
-            vaihto1Nappi.setText("");
-            vaihto2Nappi.setText("");
-            vaihto3Nappi.setText("");
-            if (häiriöt.size() >= 1) {
-                vaihto1Nappi.setDisable(false);
-                vaihto1Nappi.setText(häiriöt.get(0).getHäiriöNimi());
-            }
-            if (häiriöt.size() >= 2) {
-                vaihto2Nappi.setDisable(false);
-                vaihto2Nappi.setText(häiriöt.get(1).getHäiriöNimi());
-                vaihto3Nappi.setDisable(true);
-                vaihto3Nappi.setText("");
-            }
-            if (häiriöt.size() == 3) {
-                vaihto3Nappi.setDisable(false);
-                vaihto3Nappi.setText(häiriöt.get(2).getHäiriöNimi());
-            }
-
-            päiväNappi.setDisable(true);
-            viikkoNappi.setDisable(true);
-            koeajoNappi.setDisable(true);
-
-            listaaAsematJaHäiriöt();
+            valitseOlemassaOlevaHairio(valittuAsemaVaihtoehto);
             valittuAsemaIndeksi = 8;
-
         }
+        listaaAsematJaHäiriöt();
 
-    }
-
-    private void hoidaAsemallaOlevaOngelma(Hairio häiriö) {
-        tulostaRatkaisu(viimeisinAsema, häiriö);
-        if (häiriö.getPäivätHoitamiseen() <= 0) {
-
-            if (häiriö.isPoistaaKokoHäiriön()) {
-                poistaAsemaltaHäiriö(viimeisinAsema, viimeisinKokoHäiriö);
-            }
-
-            if (häiriö.isKeskeyttääKoeajon()) {
-                /* jos valittu häiriö keskeyttää koeajon mutta vaatii toisen
-                            valinnan ratkaisuksi, valitaan häiriö jotta asema tunnistaa sen 
-                            koeajon keskeyttäväksi häiriöksi
-                 */
-
-                for (Hairio h : viimeisinKokoHäiriö.getKokoHäiriölista()) {
-                    h.setValittu(false); // ettei kaksi häiriötä ole samaan aikaan valittuna
-                }
-                häiriö.setValittu(true);
-            }
-
-        } else {
-            teeHoidettavaksi(häiriö);
-        }
-        lisääRaha(häiriö.getHinta());
-
-        päiväNappi.setDisable(false);
-        viikkoNappi.setDisable(false);
-        vaihto1Nappi.setDisable(true);
-        vaihto2Nappi.setDisable(true);
-        vaihto3Nappi.setDisable(true);
     }
 
     @FXML
@@ -860,16 +791,19 @@ public class Kontrolleri implements Initializable {
 
         for (Asema asema : getAsemat()) {
             int onkoAsemallaHäiriöitä = tarkastaOnkoAsemallaHäiriöitä(asema);
-            
-            if (event.getSource() == matinkyläLabel && !päiväNappi.isDisable()) {
-                valittuAsemaIndeksi = 7;
-                if (onkoAsemallaHäiriöitä == 0 && asema.getNimi().equals("Matinkylä")) {
+
+            Label label = (Label) event.getSource();
+            String asemanNimi = label.getId();
+
+            if (!päiväNappi.isDisable()) {
+                valittuAsemaIndeksi = asemat.indexOf(asemanNimi);
+                if (onkoAsemallaHäiriöitä == 0 && asema.getNimi().equals(asemanNimi)) {
                     vaihto1Nappi.setDisable(true);
                     vaihto2Nappi.setDisable(true);
                     vaihto3Nappi.setDisable(true);
                     häiriöIkkuna.setText("EI HÄIRIÖITÄ");
-                } else if (asema.getNimi().equals("Matinkylä")) {
-                    for (KokoHairio kokohäiriö : asemat.haeAsema("Matinkylä").getHäiriöt()) {
+                } else if (asema.getNimi().equals(asemanNimi)) {
+                    for (KokoHairio kokohäiriö : asemat.haeAsema(asemanNimi).getHäiriöt()) {
                         sb.append(kokohäiriö.getNimi());
                         sb.append("\n");
                     }
@@ -906,322 +840,6 @@ public class Kontrolleri implements Initializable {
                     }
                 }
 
-            }
-            if (event.getSource() == niittykumpuLabel && !päiväNappi.isDisable()) {
-                valittuAsemaIndeksi = 6;
-                if (onkoAsemallaHäiriöitä == 0 && asema.getNimi().equals("Niittykumpu")) {
-                    vaihto1Nappi.setDisable(true);
-                    vaihto2Nappi.setDisable(true);
-                    vaihto3Nappi.setDisable(true);
-                    häiriöIkkuna.setText("EI HÄIRIÖITÄ");
-                } else if (asema.getNimi().equals("Niittykumpu")) {
-
-                    for (KokoHairio kokohäiriö : asemat.haeAsema("Niittykumpu").getHäiriöt()) {
-                        sb.append(kokohäiriö.getNimi());
-                        sb.append("\n");
-                    }
-                    häiriöIkkuna.setText("Aseman häiriöt:" + "\n\n" + sb.toString());
-                    if (asema.getHäiriöt().size() >= 1) {
-                        vaihto1Nappi.setDisable(false);
-                        vaihto2Nappi.setDisable(true);
-                        vaihto3Nappi.setDisable(true);
-                        vaihto1Nappi.setText(asema.getHäiriöt().get(0).getNimi());
-                        if (tarkistaOnkoKokoHäiriöHoidossa(asema.getHäiriöt().get(0)) != 0) {
-                            vaihto1Nappi.setDisable(true);
-                        }
-
-                    }
-                    if (asema.getHäiriöt().size() >= 2) {
-                        vaihto1Nappi.setDisable(false);
-                        vaihto2Nappi.setDisable(false);
-                        vaihto3Nappi.setDisable(true);
-                        vaihto2Nappi.setText(asema.getHäiriöt().get(1).getNimi());
-                        if (tarkistaOnkoKokoHäiriöHoidossa(asema.getHäiriöt().get(1)) != 0) {
-                            vaihto2Nappi.setDisable(true);
-                        }
-
-                    }
-                    if (asema.getHäiriöt().size() >= 3) {
-                        vaihto1Nappi.setDisable(false);
-                        vaihto2Nappi.setDisable(false);
-                        vaihto3Nappi.setDisable(false);
-                        vaihto3Nappi.setText(asema.getHäiriöt().get(2).getNimi());
-                        if (tarkistaOnkoKokoHäiriöHoidossa(asema.getHäiriöt().get(2)) != 0) {
-                            vaihto3Nappi.setDisable(true);
-                        }
-
-                    }
-                }
-            }
-            if (event.getSource() == urheilupuistoLabel && !päiväNappi.isDisable()) {
-                valittuAsemaIndeksi = 5;
-                if (onkoAsemallaHäiriöitä == 0 && asema.getNimi().equals("Urheilupuisto")) {
-                    vaihto1Nappi.setDisable(true);
-                    vaihto2Nappi.setDisable(true);
-                    vaihto3Nappi.setDisable(true);
-                    häiriöIkkuna.setText("EI HÄIRIÖITÄ");
-                } else if (asema.getNimi().equals("Urheilupuisto")) {
-                    for (KokoHairio kokohäiriö : asemat.haeAsema("Urheilupuisto").getHäiriöt()) {
-                        sb.append(kokohäiriö.getNimi());
-                        sb.append("\n");
-                    }
-                    häiriöIkkuna.setText("Aseman häiriöt:" + "\n\n" + sb.toString());
-                    if (asema.getHäiriöt().size() >= 1) {
-                        vaihto1Nappi.setDisable(false);
-                        vaihto2Nappi.setDisable(true);
-                        vaihto3Nappi.setDisable(true);
-                        vaihto1Nappi.setText(asema.getHäiriöt().get(0).getNimi());
-                        if (tarkistaOnkoKokoHäiriöHoidossa(asema.getHäiriöt().get(0)) != 0) {
-                            vaihto1Nappi.setDisable(true);
-                        }
-
-                    }
-                    if (asema.getHäiriöt().size() >= 2) {
-                        vaihto1Nappi.setDisable(false);
-                        vaihto2Nappi.setDisable(false);
-                        vaihto3Nappi.setDisable(true);
-                        vaihto2Nappi.setText(asema.getHäiriöt().get(1).getNimi());
-                        if (tarkistaOnkoKokoHäiriöHoidossa(asema.getHäiriöt().get(1)) != 0) {
-                            vaihto2Nappi.setDisable(true);
-                        }
-
-                    }
-                    if (asema.getHäiriöt().size() >= 3) {
-                        vaihto1Nappi.setDisable(false);
-                        vaihto2Nappi.setDisable(false);
-                        vaihto3Nappi.setDisable(false);
-                        vaihto3Nappi.setText(asema.getHäiriöt().get(2).getNimi());
-                        if (tarkistaOnkoKokoHäiriöHoidossa(asema.getHäiriöt().get(2)) != 0) {
-                            vaihto3Nappi.setDisable(true);
-                        }
-
-                    }
-                }
-            }
-            if (event.getSource() == tapiolaLabel && !päiväNappi.isDisable()) {
-                valittuAsemaIndeksi = 4;
-                if (onkoAsemallaHäiriöitä == 0 && asema.getNimi().equals("Tapiola")) {
-                    vaihto1Nappi.setDisable(true);
-                    vaihto2Nappi.setDisable(true);
-                    vaihto3Nappi.setDisable(true);
-                    häiriöIkkuna.setText("EI HÄIRIÖITÄ");
-                } else if (asema.getNimi().equals("Tapiola")) {
-                    for (KokoHairio kokohäiriö : asemat.haeAsema("Tapiola").getHäiriöt()) {
-                        sb.append(kokohäiriö.getNimi());
-                        sb.append("\n");
-                    }
-                    häiriöIkkuna.setText("Aseman häiriöt:" + "\n\n" + sb.toString());
-                    if (asema.getHäiriöt().size() >= 1) {
-                        vaihto1Nappi.setDisable(false);
-                        vaihto2Nappi.setDisable(true);
-                        vaihto3Nappi.setDisable(true);
-                        vaihto1Nappi.setText(asema.getHäiriöt().get(0).getNimi());
-                        if (tarkistaOnkoKokoHäiriöHoidossa(asema.getHäiriöt().get(0)) != 0) {
-                            vaihto1Nappi.setDisable(true);
-                        }
-
-                    }
-                    if (asema.getHäiriöt().size() >= 2) {
-                        vaihto1Nappi.setDisable(false);
-                        vaihto2Nappi.setDisable(false);
-                        vaihto3Nappi.setDisable(true);
-                        vaihto2Nappi.setText(asema.getHäiriöt().get(1).getNimi());
-                        if (tarkistaOnkoKokoHäiriöHoidossa(asema.getHäiriöt().get(1)) != 0) {
-                            vaihto2Nappi.setDisable(true);
-                        }
-
-                    }
-                    if (asema.getHäiriöt().size() >= 3) {
-                        vaihto1Nappi.setDisable(false);
-                        vaihto2Nappi.setDisable(false);
-                        vaihto3Nappi.setDisable(false);
-                        vaihto3Nappi.setText(asema.getHäiriöt().get(2).getNimi());
-                        if (tarkistaOnkoKokoHäiriöHoidossa(asema.getHäiriöt().get(2)) != 0) {
-                            vaihto3Nappi.setDisable(true);
-                        }
-
-                    }
-                }
-            }
-            if (event.getSource() == aaltoLabel && !päiväNappi.isDisable()) {
-                valittuAsemaIndeksi = 3;
-                if (onkoAsemallaHäiriöitä == 0 && asema.getNimi().equals("Aalto-yliopisto")) {
-                    vaihto1Nappi.setDisable(true);
-                    vaihto2Nappi.setDisable(true);
-                    vaihto3Nappi.setDisable(true);
-                    häiriöIkkuna.setText("EI HÄIRIÖITÄ");
-                } else if (asema.getNimi().equals("Aalto-yliopisto")) {
-                    for (KokoHairio kokohäiriö : asemat.haeAsema("Aalto-yliopisto").getHäiriöt()) {
-                        sb.append(kokohäiriö.getNimi());
-                        sb.append("\n");
-                    }
-                    häiriöIkkuna.setText("Aseman häiriöt:" + "\n\n" + sb.toString());
-                    if (asema.getHäiriöt().size() >= 1) {
-                        vaihto1Nappi.setDisable(false);
-                        vaihto2Nappi.setDisable(true);
-                        vaihto3Nappi.setDisable(true);
-                        vaihto1Nappi.setText(asema.getHäiriöt().get(0).getNimi());
-                        if (tarkistaOnkoKokoHäiriöHoidossa(asema.getHäiriöt().get(0)) != 0) {
-                            vaihto1Nappi.setDisable(true);
-                        }
-
-                    }
-                    if (asema.getHäiriöt().size() >= 2) {
-                        vaihto1Nappi.setDisable(false);
-                        vaihto2Nappi.setDisable(false);
-                        vaihto3Nappi.setDisable(true);
-                        vaihto2Nappi.setText(asema.getHäiriöt().get(1).getNimi());
-                        if (tarkistaOnkoKokoHäiriöHoidossa(asema.getHäiriöt().get(1)) != 0) {
-                            vaihto2Nappi.setDisable(true);
-                        }
-
-                    }
-                    if (asema.getHäiriöt().size() >= 3) {
-                        vaihto1Nappi.setDisable(false);
-                        vaihto2Nappi.setDisable(false);
-                        vaihto3Nappi.setDisable(false);
-                        vaihto3Nappi.setText(asema.getHäiriöt().get(2).getNimi());
-                        if (tarkistaOnkoKokoHäiriöHoidossa(asema.getHäiriöt().get(2)) != 0) {
-                            vaihto3Nappi.setDisable(true);
-                        }
-
-                    }
-                }
-            }
-            if (event.getSource() == keilaniemiLabel && !päiväNappi.isDisable()) {
-                valittuAsemaIndeksi = 2;
-                if (onkoAsemallaHäiriöitä == 0 && asema.getNimi().equals("Keilaniemi")) {
-                    vaihto1Nappi.setDisable(true);
-                    vaihto2Nappi.setDisable(true);
-                    vaihto3Nappi.setDisable(true);
-                    häiriöIkkuna.setText("EI HÄIRIÖITÄ");
-                } else if (asema.getNimi().equals("Keilaniemi")) {
-                    for (KokoHairio kokohäiriö : asemat.haeAsema("Keilaniemi").getHäiriöt()) {
-                        sb.append(kokohäiriö.getNimi());
-                        sb.append("\n");
-                    }
-                    häiriöIkkuna.setText("Aseman häiriöt:" + "\n\n" + sb.toString());
-                    if (asema.getHäiriöt().size() >= 1) {
-                        vaihto1Nappi.setDisable(false);
-                        vaihto2Nappi.setDisable(true);
-                        vaihto3Nappi.setDisable(true);
-                        vaihto1Nappi.setText(asema.getHäiriöt().get(0).getNimi());
-                        if (tarkistaOnkoKokoHäiriöHoidossa(asema.getHäiriöt().get(0)) != 0) {
-                            vaihto1Nappi.setDisable(true);
-                        }
-
-                    }
-                    if (asema.getHäiriöt().size() >= 2) {
-                        vaihto1Nappi.setDisable(false);
-                        vaihto2Nappi.setDisable(false);
-                        vaihto3Nappi.setDisable(true);
-                        vaihto2Nappi.setText(asema.getHäiriöt().get(1).getNimi());
-                        if (tarkistaOnkoKokoHäiriöHoidossa(asema.getHäiriöt().get(1)) != 0) {
-                            vaihto2Nappi.setDisable(true);
-                        }
-
-                    }
-                    if (asema.getHäiriöt().size() >= 3) {
-                        vaihto1Nappi.setDisable(false);
-                        vaihto2Nappi.setDisable(false);
-                        vaihto3Nappi.setDisable(false);
-                        vaihto3Nappi.setText(asema.getHäiriöt().get(2).getNimi());
-                        if (tarkistaOnkoKokoHäiriöHoidossa(asema.getHäiriöt().get(2)) != 0) {
-                            vaihto3Nappi.setDisable(true);
-                        }
-
-                    }
-                }
-            }
-            if (event.getSource() == koivusaariLabel && !päiväNappi.isDisable()) {
-                valittuAsemaIndeksi = 1;
-                if (onkoAsemallaHäiriöitä == 0 && asema.getNimi().equals("Koivusaari")) {
-                    vaihto1Nappi.setDisable(true);
-                    vaihto2Nappi.setDisable(true);
-                    vaihto3Nappi.setDisable(true);
-                    häiriöIkkuna.setText("EI HÄIRIÖITÄ");
-                } else if (asema.getNimi().equals("Koivusaari")) {
-                    for (KokoHairio kokohäiriö : asemat.haeAsema("Koivusaari").getHäiriöt()) {
-                        sb.append(kokohäiriö.getNimi());
-                        sb.append("\n");
-                    }
-                    häiriöIkkuna.setText("Aseman häiriöt:" + "\n\n" + sb.toString());
-                    if (asema.getHäiriöt().size() >= 1) {
-                        vaihto1Nappi.setDisable(false);
-                        vaihto2Nappi.setDisable(true);
-                        vaihto3Nappi.setDisable(true);
-                        vaihto1Nappi.setText(asema.getHäiriöt().get(0).getNimi());
-                        if (tarkistaOnkoKokoHäiriöHoidossa(asema.getHäiriöt().get(0)) != 0) {
-                            vaihto1Nappi.setDisable(true);
-                        }
-
-                    }
-                    if (asema.getHäiriöt().size() >= 2) {
-                        vaihto1Nappi.setDisable(false);
-                        vaihto2Nappi.setDisable(false);
-                        vaihto3Nappi.setDisable(true);
-                        vaihto2Nappi.setText(asema.getHäiriöt().get(1).getNimi());
-                        if (tarkistaOnkoKokoHäiriöHoidossa(asema.getHäiriöt().get(1)) != 0) {
-                            vaihto2Nappi.setDisable(true);
-                        }
-
-                    }
-                    if (asema.getHäiriöt().size() >= 3) {
-                        vaihto1Nappi.setDisable(false);
-                        vaihto2Nappi.setDisable(false);
-                        vaihto3Nappi.setDisable(false);
-                        vaihto3Nappi.setText(asema.getHäiriöt().get(2).getNimi());
-                        if (tarkistaOnkoKokoHäiriöHoidossa(asema.getHäiriöt().get(2)) != 0) {
-                            vaihto3Nappi.setDisable(true);
-                        }
-
-                    }
-                }
-            }
-            if (event.getSource() == lauttasaariLabel && !päiväNappi.isDisable()) {
-                valittuAsemaIndeksi = 0;
-                if (onkoAsemallaHäiriöitä == 0 && asema.getNimi().equals("Lauttasaari")) {
-                    vaihto1Nappi.setDisable(true);
-                    vaihto2Nappi.setDisable(true);
-                    vaihto3Nappi.setDisable(true);
-                    häiriöIkkuna.setText("EI HÄIRIÖITÄ");
-                } else if (asema.getNimi().equals("Lauttasaari")) {
-                    for (KokoHairio kokohäiriö : asemat.haeAsema("Lauttasaari").getHäiriöt()) {
-                        sb.append(kokohäiriö.getNimi());
-                        sb.append("\n");
-                    }
-                    häiriöIkkuna.setText("Aseman häiriöt:" + "\n\n" + sb.toString());
-                    if (asema.getHäiriöt().size() >= 1) {
-                        vaihto1Nappi.setDisable(false);
-                        vaihto2Nappi.setDisable(true);
-                        vaihto3Nappi.setDisable(true);
-                        vaihto1Nappi.setText(asema.getHäiriöt().get(0).getNimi());
-                        if (tarkistaOnkoKokoHäiriöHoidossa(asema.getHäiriöt().get(0)) != 0) {
-                            vaihto1Nappi.setDisable(true);
-                        }
-
-                    }
-                    if (asema.getHäiriöt().size() >= 2) {
-                        vaihto1Nappi.setDisable(false);
-                        vaihto2Nappi.setDisable(false);
-                        vaihto3Nappi.setDisable(true);
-                        vaihto2Nappi.setText(asema.getHäiriöt().get(1).getNimi());
-                        if (tarkistaOnkoKokoHäiriöHoidossa(asema.getHäiriöt().get(1)) != 0) {
-                            vaihto2Nappi.setDisable(true);
-                        }
-
-                    }
-                    if (asema.getHäiriöt().size() >= 3) {
-                        vaihto1Nappi.setDisable(false);
-                        vaihto2Nappi.setDisable(false);
-                        vaihto3Nappi.setDisable(false);
-                        vaihto3Nappi.setText(asema.getHäiriöt().get(2).getNimi());
-                        if (tarkistaOnkoKokoHäiriöHoidossa(asema.getHäiriöt().get(2)) != 0) {
-                            vaihto3Nappi.setDisable(true);
-                        }
-
-                    }
-                }
             }
         }
     }
@@ -1310,6 +928,7 @@ public class Kontrolleri implements Initializable {
         vaihto2Nappi.setDisable(true);
         vaihto3Nappi.setDisable(true);
         koeajoNappi.setStyle("-fx-background-color: lightgreen;");
+        asetaLabelIdt();
 
     }
 
